@@ -22,6 +22,10 @@ public class SocketChannelDemo {
         //然后将buffer写到channel去
         socketChannel.write(buf);
         socketChannel.close();
+
+        //想要debug的话，就需要在client sleep一下 然后server 就可以接收到信息了
+//        Thread.sleep(50000);
+
     }
 
     public static void main(String[] args) throws Exception {
