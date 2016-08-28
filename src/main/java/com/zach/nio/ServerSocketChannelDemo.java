@@ -38,8 +38,16 @@ public class ServerSocketChannelDemo {
                     System.out.println(charset.newDecoder().decode(buf));
                     size = socketChannel.read(buf);
                 }
+                //不要占用内存，直接清空
+                buf.clear();
 
-                //读完之后直接关掉
+                //收到数据之后将数据写回去（写给客户端）
+                ByteBuffer response = ByteBuffer.wrap("client, hello!".getBytes("UTF-8"));
+                socketChannel.write(response);
+                //写完之后要关掉
+                response.clear();
+
+                //读完之后关掉channel要
                 socketChannel.close();
             }
         }
