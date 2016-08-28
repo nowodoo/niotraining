@@ -13,7 +13,8 @@ public class SocketChannelDemo {
         //和server的设置都是一样的
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.connect(new InetSocketAddress("localhost", 8999));
-        socketChannel.configureBlocking(false);
+        //这个地方的意思就是不管你有么有读写，后面就直接读过去了   后面  int size = socketChannel.read(rbuf);  这一行就是了
+//        socketChannel.configureBlocking(false);
 
 
         String request = "hello, I am one of the client!";
