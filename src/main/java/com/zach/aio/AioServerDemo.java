@@ -19,7 +19,7 @@ public class AioServerDemo {
     private static CountDownLatch latch;
 
     public static void startServer() throws Exception {
-        AsynchronousServerSocketChannel asynchronousServerSocketChannel = AsynchronousServerSocketChannel.open();
+        final AsynchronousServerSocketChannel asynchronousServerSocketChannel = AsynchronousServerSocketChannel.open();
         asynchronousServerSocketChannel.bind(new InetSocketAddress(8999));
         //初始化变量
         latch = new CountDownLatch(1);
@@ -34,6 +34,8 @@ public class AioServerDemo {
             @Override
             public void completed(AsynchronousSocketChannel result, Void attachment) {
                 try {
+                    //解决server只会accept一次的问题。
+                    asynchronousServerSocketChannel.accept(attachment, this);
                     operate(result);
                 } catch (Exception e) {
                     e.printStackTrace();
