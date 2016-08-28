@@ -1,5 +1,7 @@
 package com.zach.nio;
 
+import io.netty.channel.ServerChannel;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -35,6 +37,8 @@ public class ClientThread extends Thread {
                         buf.flip();
                         Charset charset = Charset.forName("UTF-8");
                         System.out.println(charset.newDecoder().decode(buf).toString());
+                        //只要是漏了这一句，就会造成死循环。
+                        size = socketChannel.read(buf);
                     }
                     //处理完一个channel就要释放这个channel
                     selector.selectedKeys().remove(key);
