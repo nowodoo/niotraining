@@ -68,7 +68,8 @@ public class AioServerDemo {
         while (size > 0) {
             buf.flip();
             Charset charset = Charset.forName("UTF-8");
-            charset.newDecoder().decode(buf).toString();
+            String message = charset.newDecoder().decode(buf).toString();
+            System.out.println(message);
             size = ch.read(buf).get();
         }
 
