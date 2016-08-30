@@ -19,6 +19,8 @@ public class DiscardServerHandler extends ChannelHandlerAdapter {
         //这里就是处理管道的
         ByteBuf buf = (ByteBuf)msg;
         while (buf.isReadable()) {
+            System.out.print((char)buf.readByte());
+            System.out.flush();
         }
     }
 }
