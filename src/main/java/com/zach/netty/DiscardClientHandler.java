@@ -20,5 +20,11 @@ public class DiscardClientHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        //在这里读取server传回的数据
+        ByteBuf buf = (ByteBuf)msg;
+        while (buf.isReadable()) {
+            System.out.print((char) buf.readByte());
+            System.out.flush();
+        }
     }
 }
