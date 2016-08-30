@@ -24,7 +24,7 @@ public class DiscardServerHandler extends ChannelHandlerAdapter {
         }
 
         //读到了然后再次写回去
-        ctx.alloc().buffer().writeBytes("您收到了吗?".getBytes());
-        ctx.writeAndFlush(msg);
+        ByteBuf wbuf =  ctx.alloc().buffer().writeBytes("您收到了吗?".getBytes("UTF-8"));
+        ctx.writeAndFlush(wbuf);
     }
 }
