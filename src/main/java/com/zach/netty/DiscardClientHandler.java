@@ -34,5 +34,8 @@ public class DiscardClientHandler extends ChannelHandlerAdapter {
 
         //在这里设置一个值，然后在client的前段获取这个值
         ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(stringBuilder.toString());
+        //解决阻碍的问题
+        ctx.channel().close();
+        ctx.close();
     }
 }

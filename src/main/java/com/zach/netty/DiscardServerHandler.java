@@ -27,8 +27,6 @@ public class DiscardServerHandler extends ChannelHandlerAdapter {
         ByteBuf wbuf =  ctx.alloc().buffer().writeBytes("do you received(from server)?".getBytes("UTF-8"));
         ctx.writeAndFlush(wbuf);
 
-        //解决阻碍的问题
-        ctx.channel().close();
-        ctx.close();
+
     }
 }

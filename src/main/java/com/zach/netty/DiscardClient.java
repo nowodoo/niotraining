@@ -39,7 +39,7 @@ public class DiscardClient {
             ChannelFuture f = b.connect("localhost", 8999).sync();
             f.channel().closeFuture().sync();
 
-            //在这里获取比较特别的一个特殊的一个对象的一个属性（就是在handler中的一个属性）
+            //在这里获取比较特别的一个特殊的一个对象的一个属性（就是在handler中的属性）
             return f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY));
 
         } catch (InterruptedException e) {
