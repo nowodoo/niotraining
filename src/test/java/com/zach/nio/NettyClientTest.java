@@ -9,8 +9,14 @@ import org.junit.Test;
 public class NettyClientTest {
     @Test
     public void test01() {
-        //在这里模拟很多的线程
-        Object obj = DiscardClient.startClient();
+        Object obj = null;
+        try {
+            //在这里模拟很多的线程
+            obj = DiscardClient.startClient("hello server");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
         System.out.println(obj);
     }
 }

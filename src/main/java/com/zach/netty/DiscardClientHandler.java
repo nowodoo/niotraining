@@ -15,11 +15,19 @@ public class DiscardClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //使用客户端写数据
-        ByteBuf buf = ctx.alloc().buffer().writeBytes("hello netty server".getBytes("UTF-8"));
+        //在这里获取数据
+        String req = (String)ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
+        ByteBuf buf = ctx.alloc().buffer().writeBytes(req.getBytes("UTF-8"));
         //下面才是真正的将数据写出去，否则要等到这个通道满了才可以溢出
         ctx.writeAndFlush(buf);
     }
 
+    /**
+     * 这个是用来接收server传回来的数据的
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //在这里读取server传回的数据
@@ -27,7 +35,7 @@ public class DiscardClientHandler extends ChannelHandlerAdapter {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-
+        //获取server传来的数值
         while (buf.isReadable()) {
             stringBuilder.append((char) buf.readByte());
         }
