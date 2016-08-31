@@ -16,10 +16,10 @@ public class DiscardClientHandler extends ChannelHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //使用客户端写数据
         //在这里获取数据
-        String req = (String)ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
-        ByteBuf buf = ctx.alloc().buffer().writeBytes(req.getBytes("UTF-8"));
-        //下面才是真正的将数据写出去，否则要等到这个通道满了才可以溢出
-        ctx.writeAndFlush(buf);
+//        String req = (String)ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
+//        ByteBuf buf = ctx.alloc().buffer().writeBytes(req.getBytes("UTF-8"));
+//        //下面才是真正的将数据写出去，否则要等到这个通道满了才可以溢出
+//        ctx.writeAndFlush(buf);
     }
 
     /**
