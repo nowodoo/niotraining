@@ -11,6 +11,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.AttributeKey;
 
 /**
@@ -36,6 +39,13 @@ public class DiscardClient {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
+                    //添加解码器
+                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()[0]));
+                    ch.pipeline().addLast(new StringDecoder());
+
+                    //添加编码器
+                    ch.pipeline().addLast(new MyEncoder());
+
                     ch.pipeline().addLast(new DiscardClientHandler());
                 }
             });
@@ -56,8 +66,11 @@ public class DiscardClient {
 //        f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(obj);
 
         //使用另一种方式将数据写到handler里面去
-        ByteBuf buf = allocator.buffer().writeBytes(((String)obj).getBytes("UTF-8"));
-        f.channel().writeAndFlush(buf);
+//        ByteBuf buf = allocator.buffer().writeBytes(((String)obj).getBytes("UTF-8"));
+//        f.channel().writeAndFlush(buf);
+
+        //添加了编码器和解码器之后的写法
+        f.channel().writeAndFlush("hello");
 
         f.channel().closeFuture().sync();
 

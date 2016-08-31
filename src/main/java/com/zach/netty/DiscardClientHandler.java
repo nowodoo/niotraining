@@ -31,19 +31,21 @@ public class DiscardClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //在这里读取server传回的数据
-        ByteBuf buf = (ByteBuf)msg;
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        //获取server传来的数值
-        while (buf.isReadable()) {
-            stringBuilder.append((char) buf.readByte());
-        }
+//        ByteBuf buf = (ByteBuf)msg;
+//
+//        StringBuilder stringBuilder = new StringBuilder();
+//
+//        //获取server传来的数值
+//        while (buf.isReadable()) {
+//            stringBuilder.append((char) buf.readByte());
+//        }
 
         //在这里设置一个值，然后在client的前段获取这个值
-        ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(stringBuilder.toString());
+        ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(msg.toString());
         //解决阻碍的问题
         ctx.channel().close();
+
+        //在这里关闭，server是知道的
         ctx.close();
     }
 }

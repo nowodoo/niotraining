@@ -17,20 +17,21 @@ public class DiscardServerHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //这里就是处理管道的
-        ByteBuf buf = (ByteBuf)msg;
-        while (buf.isReadable()) {
-            System.out.print((char) buf.readByte());
-            System.out.flush();
-        }
-
-        //读到了然后再次写回去
-        ByteBuf wbuf =  ctx.alloc().buffer().writeBytes("do you received(from server)?".getBytes("UTF-8"));
+//        ByteBuf buf = (ByteBuf)msg;
+//        while (buf.isReadable()) {
+//            System.out.print((char) buf.readByte());
+//            System.out.flush();
+//        }
+//
+//        //读到了然后再次写回去
+//        ByteBuf wbuf =  ctx.alloc().buffer().writeBytes("do you received(from server)?".getBytes("UTF-8"));
 
         //处理业务代码
+        System.out.println(msg);
 
 
-
-        ctx.writeAndFlush(wbuf);
+        String result = "i've received"+msg;
+        ctx.writeAndFlush(result);
 
 
     }
