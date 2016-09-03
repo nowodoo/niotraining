@@ -1,0 +1,7 @@
+option java_package="com.zach.netty.protobuf";
+option java_outer_classname="RequestMsgProtoBuf";
+
+message RequestMsg{
+    required string cmd = 1;
+    required bytes requestParam = 2;
+}

@@ -1,0 +1,8 @@
+option java_package="com.zach.netty.protobuf";
+option java_outer_classname="UserProtoBuf";
+
+message User{
+    required int32 id = 1;
+    required string userName = 2;
+    required string phonie = 3;
+}
