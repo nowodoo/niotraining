@@ -2,6 +2,7 @@ package com.zach.netty.protobuf;
 
 
 import com.google.protobuf.ByteString;
+import com.zach.netty.media.Media;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -20,13 +21,11 @@ public class PfServerHandler extends ChannelHandlerAdapter {
         RequestMsgProtoBuf.RequestMsg requestMsg = (RequestMsgProtoBuf.RequestMsg)msg;
         String cmd = requestMsg.getCmd();
 
-        //获取真实的参数
-        ByteString buf = requestMsg.getRequestParam();
-
-        UserProBuf.User user = UserProBuf.User.parseFrom(buf);
+        //这里就是业务方法，业务方法处理了之后直接返回给客户端
+        Object response = Media.execute(requestMsg);
 
         //收到之后给个回应
-        ctx.writeAndFlush(user);
+        ctx.writeAndFlush(response);
 
         ctx.channel().close();
     }

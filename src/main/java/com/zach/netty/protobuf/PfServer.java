@@ -6,8 +6,12 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 
-public class PfServer {
+public class PfServer implements ApplicationListener<ContextRefreshedEvent>,Ordered {
 
     private int port;
 
@@ -46,5 +50,14 @@ public class PfServer {
     public static void main(String[] args) throws Exception {
         int port = 8999;
         new PfServer(port).run();
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
     }
 }
