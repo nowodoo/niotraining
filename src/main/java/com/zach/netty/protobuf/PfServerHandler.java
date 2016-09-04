@@ -21,11 +21,13 @@ public class PfServerHandler extends ChannelHandlerAdapter {
         RequestMsgProtoBuf.RequestMsg requestMsg = (RequestMsgProtoBuf.RequestMsg)msg;
         String cmd = requestMsg.getCmd();
 
-        //这里就是业务方法，业务方法处理了之后直接返回给客户端
-        Object response = Media.execute(requestMsg);
+        //获取真实的参数
+        ByteString buf = requestMsg.getRequestParam();
+
+        UserProBuf.User user = UserProBuf.User.parseFrom(buf);
 
         //收到之后给个回应
-        ctx.writeAndFlush(response);
+        ctx.writeAndFlush(requestMsg);
 
         ctx.channel().close();
     }

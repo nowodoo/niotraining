@@ -12,4 +12,14 @@ public class PfTest {
         UserService userService = new UserService();
         userService.save();
     }
+
+    @Test
+    public void getEmail() throws Exception {
+        UserService userService = new UserService();
+        RequestMsgProtoBuf.RequestMsg requestMsg = userService.getEmail();
+
+        System.out.println(requestMsg);
+
+    }
+
 }

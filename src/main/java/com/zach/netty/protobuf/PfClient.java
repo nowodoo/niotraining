@@ -1,5 +1,6 @@
 package com.zach.netty.protobuf;
 
+import com.google.protobuf.ByteString;
 import com.zach.netty.constants.CommonConstant;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
