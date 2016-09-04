@@ -1,5 +1,5 @@
 option java_package="com.zach.netty.protobuf";
-option java_outer_classname="UserProtoBuf";
+option java_outer_classname="UserProBuf";
 
 message User{
     required int32 id = 1;

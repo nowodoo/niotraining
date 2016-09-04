@@ -1,8 +1,7 @@
-package com.zach.netty;
+package com.zach.netty.protobuf;
 
 import com.zach.netty.constants.CommonConstant;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -13,22 +12,23 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.AttributeKey;
 
 /**
  * Created by Administrator on 2016-8-30.
  */
-public class DiscardClient {
+public class PfClient {
 
-    //优化client
     public static Bootstrap b;
 
-    //用来往handler里面传值
     public static PooledByteBufAllocator allocator = new PooledByteBufAllocator();
 
     static {
-        //客户端只有worker线程
         try {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             b = new Bootstrap(); // (1)
@@ -39,13 +39,11 @@ public class DiscardClient {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     //添加解码器（针对入站的数据进行解码）
-                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()[0]));
-                    ch.pipeline().addLast(new StringDecoder());
-
-                    //添加编码器
-                    ch.pipeline().addLast(new MyEncoder());
-
-                    ch.pipeline().addLast(new DiscardClientHandler());
+                    ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
+                    ch.pipeline().addLast(new ProtobufDecoder(RequestMsgProtoBuf.RequestMsg.getDefaultInstance()));
+                    ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
+                    ch.pipeline().addLast(new ProtobufEncoder());
+                    ch.pipeline().addLast(new PfClientHandler());
                 }
             });
 
@@ -57,23 +55,10 @@ public class DiscardClient {
         }
     }
 
-    public static Object startClient(Object obj) throws Exception {
-        //下面表示先链接，然后在等待   这里f不是静态的
-        ChannelFuture f = b.connect("localhost", 8999).sync(); // (5);
-        //在这里设置一个值，然后去另一个地方获取这个值
-        //在这里需要做的就是将数据写到handler里面去
-//        f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(obj);
-
-        //使用另一种方式将数据写到handler里面去
-//        ByteBuf buf = allocator.buffer().writeBytes(((String)obj).getBytes("UTF-8"));
-//        f.channel().writeAndFlush(buf);
-
-        //添加了编码器和解码器之后的写法
-        f.channel().writeAndFlush("hello");
-
+    public static Object startClient(RequestMsgProtoBuf.RequestMsg.Builder requestMsg) throws Exception {
+        ChannelFuture f = b.connect("localhost", 8999).sync();
+        f.channel().writeAndFlush(requestMsg);
         f.channel().closeFuture().sync();
-
-        //在这里获取比较特别的一个特殊的一个对象的一个属性（就是在handler中的属性）
         return f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
     }
 
