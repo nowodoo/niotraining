@@ -16,9 +16,11 @@ public class PfTest {
     @Test
     public void getEmail() throws Exception {
         UserService userService = new UserService();
-        RequestMsgProtoBuf.RequestMsg requestMsg = userService.getEmail();
+        ResponseMsgProtoBuf.ResponseMsg responseMsg = userService.getEmail();
 
-        System.out.println(requestMsg);
+        EmailProBuf.Email email = EmailProBuf.Email.parseFrom(responseMsg.getResponse());
+
+        System.out.println(email);
 
     }
 

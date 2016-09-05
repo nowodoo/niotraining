@@ -1,9 +1,7 @@
 package com.zach.netty.user;
 
-import com.zach.netty.protobuf.EmailProBuf;
-import com.zach.netty.protobuf.PfClient;
-import com.zach.netty.protobuf.RequestMsgProtoBuf;
-import com.zach.netty.protobuf.UserProBuf;
+import com.google.protobuf.ByteString;
+import com.zach.netty.protobuf.*;
 
 /**
  * Created by Administrator on 2016-9-3.
@@ -23,25 +21,35 @@ public class UserService {
 
 
         //调用client
-        UserProBuf.User returnUser = (UserProBuf.User)PfClient.startClient(requestMsg);
-        System.out.println(returnUser);
+        ResponseMsgProtoBuf.ResponseMsg response = (ResponseMsgProtoBuf.ResponseMsg)PfClient.startClient(requestMsg);
+        System.out.println(response);
 
 
 
     }
 
-    public RequestMsgProtoBuf.RequestMsg getEmail() throws Exception {
+    public ResponseMsgProtoBuf.ResponseMsg getEmail() throws Exception {
         UserProBuf.User.Builder user = UserProBuf.User.newBuilder();
         user.setId(1);
         user.setPhonie("13800000000");
         user.setUserName("xiaoming");
 
+
+        //放进一个email去
+        EmailProBuf.Email.Builder email = EmailProBuf.Email.newBuilder();
+        email.setId(1);
+        email.setFromUser("张三");
+        email.setSubject("test");
+        email.setContent("test content");
+
         //创建消息
         RequestMsgProtoBuf.RequestMsg.Builder requestMsg = RequestMsgProtoBuf.RequestMsg.newBuilder();
         requestMsg.setCmd("saveUser");
-        requestMsg.setRequestParam(user.build().toByteString());
+        requestMsg.setRequestParam(email.build().toByteString());
 
-        return (RequestMsgProtoBuf.RequestMsg)PfClient.startClient(requestMsg);
+        ResponseMsgProtoBuf.ResponseMsg responseMsg = PfClient.startClient(requestMsg);
+
+        return responseMsg;
     }
 
 }

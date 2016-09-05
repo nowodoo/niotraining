@@ -41,7 +41,7 @@ public class PfClient {
                 public void initChannel(SocketChannel ch) throws Exception {
                     //添加解码器（针对入站的数据进行解码）
                     ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-                    ch.pipeline().addLast(new ProtobufDecoder(RequestMsgProtoBuf.RequestMsg.getDefaultInstance()));
+                    ch.pipeline().addLast(new ProtobufDecoder(ResponseMsgProtoBuf.ResponseMsg.getDefaultInstance()));
                     ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
                     ch.pipeline().addLast(new ProtobufEncoder());
                     ch.pipeline().addLast(new PfClientHandler());
@@ -56,11 +56,11 @@ public class PfClient {
         }
     }
 
-    public static Object startClient(RequestMsgProtoBuf.RequestMsg.Builder requestMsg) throws Exception {
+    public static ResponseMsgProtoBuf.ResponseMsg startClient(RequestMsgProtoBuf.RequestMsg.Builder requestMsg) throws Exception {
         ChannelFuture f = b.connect("localhost", 8999).sync();
         f.channel().writeAndFlush(requestMsg);
         f.channel().closeFuture().sync();
-        return f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
+        return (ResponseMsgProtoBuf.ResponseMsg)f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
     }
 
     public static void main(String[] args) {

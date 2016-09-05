@@ -26,8 +26,13 @@ public class PfServerHandler extends ChannelHandlerAdapter {
 
         UserProBuf.User user = UserProBuf.User.parseFrom(buf);
 
+        //封装返回参数
+        ResponseMsgProtoBuf.ResponseMsg.Builder responseMsg = ResponseMsgProtoBuf.ResponseMsg.newBuilder();
+        responseMsg.setResponse(user.toByteString());
+
+
         //收到之后给个回应
-        ctx.writeAndFlush(requestMsg);
+        ctx.writeAndFlush(responseMsg);
 
         ctx.channel().close();
     }

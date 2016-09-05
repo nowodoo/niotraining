@@ -1,0 +1,6 @@
+option java_package="com.zach.netty.protobuf";
+option java_outer_classname="ResponseMsgProtoBuf";
+
+message ResponseMsg{
+    required bytes response = 1;
+}

@@ -15,7 +15,8 @@ public class PfClientHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(msg);
+        ResponseMsgProtoBuf.ResponseMsg responseMsg = (ResponseMsgProtoBuf.ResponseMsg)msg;
+        ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(responseMsg);
         ctx.channel().close();
     }
 }
