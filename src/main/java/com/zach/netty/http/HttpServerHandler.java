@@ -1,15 +1,13 @@
 package com.zach.netty.http;
 
 
-import com.google.protobuf.ByteString;
 import com.zach.netty.media.Media;
-import com.zach.netty.protobuf.*;
-import com.zach.netty.protobuf.ResponseMsgProtoBuf;
 import com.zach.utils.JsonUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.*;
 
 import java.nio.charset.Charset;
 
@@ -27,14 +25,18 @@ public class HttpServerHandler extends ChannelHandlerAdapter {
         FullHttpRequest request = (FullHttpRequest) msg;
         ByteBuf buf = request.content();
         String req  = buf.toString(Charset.forName("UTF-8"));
-
         RequestParam requestParam = JsonUtils.jsonToBean(req, RequestParam.class);
+        //处理的业务逻辑，返回值
+        Object resp = Media.execute(requestParam);
+        String jsonp = JsonUtils.beanToJson(resp);
 
-        String cmd = requestParam.getCommand();
-        System.out.println(cmd);
-
-        //收到之后给个回应
-        ctx.writeAndFlush(null);
+        //转换为http格式   unpooled 就是一个工具类，创建一个新的buffer对象就是了
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(jsonp.getBytes("UTF-8")));
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE,"text/plain");
+        response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+        response.headers().set(HttpHeaderNames.CONNECTION,HttpHeaderValues.KEEP_ALIVE);
+        //server always write response back
+        ctx.writeAndFlush(response);
 
         ctx.channel().close();
     }
