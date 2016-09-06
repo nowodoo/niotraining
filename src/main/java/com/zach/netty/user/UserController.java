@@ -25,4 +25,12 @@ public class UserController {
 
         return response;
     }
+
+    @Remote("httpGetEmailByUser")
+    public Object getEmailByUser(String email) {
+
+        email = email + "hhhh";
+
+        return email;
+    }
 }

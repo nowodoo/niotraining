@@ -3,8 +3,11 @@ package com.zach.netty.http;
 import com.zach.netty.constants.CommonConstant;
 import com.zach.netty.protobuf.*;
 import com.zach.netty.protobuf.ResponseMsgProtoBuf;
+import com.zach.utils.JsonUtils;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -12,11 +15,14 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.util.AttributeKey;
+
+import java.net.URI;
 
 /**
  * Created by Administrator on 2016-8-30.
@@ -38,10 +44,11 @@ public class HttpClient {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     //添加解码器（针对入站的数据进行解码）
-                    ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-                    ch.pipeline().addLast(new ProtobufDecoder(com.zach.netty.protobuf.ResponseMsgProtoBuf.ResponseMsg.getDefaultInstance()));
-                    ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
-                    ch.pipeline().addLast(new ProtobufEncoder());
+                    ch.pipeline().addLast(new HttpRequestEncoder());
+                    ch.pipeline().addLast(new HttpObjectAggregator(65536));
+                    //然后对server Handler返回的数据进行解码
+                    ch.pipeline().addLast(new HttpResponseDecoder());
+                    //添加handler
                     ch.pipeline().addLast(new HttpClientHandler());
                 }
             });
@@ -54,11 +61,21 @@ public class HttpClient {
         }
     }
 
-    public static com.zach.netty.protobuf.ResponseMsgProtoBuf.ResponseMsg startClient(RequestMsgProtoBuf.RequestMsg.Builder requestMsg) throws Exception {
+    public static Object startClient(RequestParam requestParam) throws Exception {
         ChannelFuture f = b.connect("localhost", 8999).sync();
-        f.channel().writeAndFlush(requestMsg);
+        URI uri = new URI("http://localhost:8999");
+        //使用unpooled这个工具类将转换为bytebuf
+        ByteBuf content = Unpooled.wrappedBuffer(JsonUtils.beanToJson(requestParam).getBytes("UTF-8"));
+        DefaultFullHttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString(), content);
+        req.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+        req.headers().set(HttpHeaderNames.HOST, "localhost");
+        req.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        req.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+
+        //将数据直接写出去
+        f.channel().writeAndFlush(req);
         f.channel().closeFuture().sync();
-        return (ResponseMsgProtoBuf.ResponseMsg)f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
+        return f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
     }
 
     public static void main(String[] args) {
