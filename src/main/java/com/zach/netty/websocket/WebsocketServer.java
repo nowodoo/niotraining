@@ -11,16 +11,16 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-@Component
-public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Ordered {
+//@Component
+public class WebsocketServer implements ApplicationListener<ContextRefreshedEvent>,Ordered {
 
     private int port;
 
-    public HttpServer(int port) {
+    public WebsocketServer(int port) {
         this.port = port;
     }
 
-    public HttpServer() {
+    public WebsocketServer() {
     }
 
 
@@ -33,7 +33,7 @@ public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Or
             b.group(bossGroup, workerGroup)
                     //指定channel
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new HttpChannelInitializer())  //指定handler  下面有两个类去实现，一个是正常的类另一个是真正的实现逻辑
+                    .childHandler(new WebsocketChannelInitializer())  //指定handler  下面有两个类去实现，一个是正常的类另一个是真正的实现逻辑
                     .option(ChannelOption.SO_BACKLOG, 128)     //请求线程全忙之后，还允许多少个线程进入
                     .childOption(ChannelOption.SO_KEEPALIVE, true);  //表示在长连接的情况下 是不是需要心跳检测
 
@@ -54,7 +54,7 @@ public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Or
 
     public static void main(String[] args) throws Exception {
         int port = 8999;
-        new HttpServer(port).run(port);
+        new WebsocketServer(port).run(port);
     }
 
     @Override
