@@ -26,16 +26,13 @@ public class ThriftServerHandler extends ChannelHandlerAdapter {
         ByteBuf buf = request.content();
         String req  = buf.toString(Charset.forName("UTF-8"));
         RequestParam requestParam = JsonUtils.jsonToBean(req, RequestParam.class);
-        //处理的业务逻辑，返回值
         Object resp = Media.execute(requestParam);
         String jsonp = JsonUtils.beanToJson(resp);
 
-        //转换为http格式   unpooled 就是一个工具类，创建一个新的buffer对象就是了
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(jsonp.getBytes("UTF-8")));
         response.headers().set(HttpHeaderNames.CONTENT_TYPE,"text/plain");
         response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
         response.headers().set(HttpHeaderNames.CONNECTION,HttpHeaderValues.KEEP_ALIVE);
-        //server always write response back
         ctx.writeAndFlush(response);
 
         ctx.channel().close();

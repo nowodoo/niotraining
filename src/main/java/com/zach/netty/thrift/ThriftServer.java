@@ -37,14 +37,11 @@ public class ThriftServer implements ApplicationListener<ContextRefreshedEvent>,
                     .option(ChannelOption.SO_BACKLOG, 128)     //请求线程全忙之后，还允许多少个线程进入
                     .childOption(ChannelOption.SO_KEEPALIVE, true);  //表示在长连接的情况下 是不是需要心跳检测
 
-            //绑定端口
             ChannelFuture f = b.bind(port).sync();
-            //绑定完端口需要在这里一直等待。
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }finally {
-            //用于关闭两个线程
             bossGroup.close();
             workerGroup.close();
         }
