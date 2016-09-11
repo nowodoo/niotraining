@@ -19,9 +19,17 @@ public class ChatRoomHandler extends SimpleChannelInboundHandler<TextWebSocketFr
     public static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     @Override
-    protected void messageReceived(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) throws Exception {
-
-
+    protected void messageReceived(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
+        String content = msg.text();
+        Channel incoming = ctx.channel();
+        for (Channel channel : channels) {
+            //表示其他的channel才会收到信息，本身的的话就直接关闭
+            if (channel != incoming) {
+                channel.writeAndFlush(ctx.channel().remoteAddress()+":"+content);
+            } else {
+                channel.writeAndFlush("服务器返回!");
+            }
+        }
     }
 
     /**
