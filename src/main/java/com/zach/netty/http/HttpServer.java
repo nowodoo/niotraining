@@ -1,7 +1,5 @@
 package com.zach.netty.http;
 
-import com.zach.netty.protobuf.*;
-import com.zach.netty.protobuf.PfChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -13,7 +11,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Ordered {
 
     private int port;
@@ -22,7 +20,11 @@ public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Or
         this.port = port;
     }
 
-    public void run() throws Exception {
+    public HttpServer() {
+    }
+
+
+    public void run(int port) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -31,7 +33,7 @@ public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Or
             b.group(bossGroup, workerGroup)
                     //指定channel
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new PfChannelInitializer())  //指定handler  下面有两个类去实现，一个是正常的类另一个是真正的实现逻辑
+                    .childHandler(new HttpChannelInitializer())  //指定handler  下面有两个类去实现，一个是正常的类另一个是真正的实现逻辑
                     .option(ChannelOption.SO_BACKLOG, 128)     //请求线程全忙之后，还允许多少个线程进入
                     .childOption(ChannelOption.SO_KEEPALIVE, true);  //表示在长连接的情况下 是不是需要心跳检测
 
@@ -52,11 +54,18 @@ public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Or
 
     public static void main(String[] args) throws Exception {
         int port = 8999;
-        new com.zach.netty.protobuf.PfServer(port).run();
+        new com.zach.netty.http.HttpServer(port).run(port);
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        int port = 8999;
+        try {
+            run(port);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+        }
     }
 
     @Override

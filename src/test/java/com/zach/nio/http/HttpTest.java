@@ -13,7 +13,8 @@ public class HttpTest {
     public void testHttpNettyClient() throws Exception {
         RequestParam requestParam = new RequestParam();
         requestParam.setCommand("httpGetEmailByUser");
-        requestParam.setParameter("hello");
+        requestParam.setParameter("{\"username\":\"1\"}");
+//        requestParam.setParameter("helloString");
         Object obj = HttpClient.startClient(requestParam);
         System.out.println(obj);
     }

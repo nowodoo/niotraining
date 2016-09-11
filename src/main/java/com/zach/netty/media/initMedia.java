@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by Administrator on 2016-9-4.
  */
 @Component
-public class initMedia implements ApplicationListener<ContextRefreshedEvent>,Ordered {
+public class InitMedia implements ApplicationListener<ContextRefreshedEvent>,Ordered {
 
     /**
      *  在容器启动的时候将所有的bean放在一个map里面

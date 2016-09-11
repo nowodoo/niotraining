@@ -63,12 +63,12 @@ public class HttpClient {
 
     public static Object startClient(RequestParam requestParam) throws Exception {
         ChannelFuture f = b.connect("localhost", 8999).sync();
-        URI uri = new URI("http://localhost:8999");
+        URI uri = new URI("http://127.0.0.1:8999");
         //使用unpooled这个工具类将转换为bytebuf
         ByteBuf content = Unpooled.wrappedBuffer(JsonUtils.beanToJson(requestParam).getBytes("UTF-8"));
         DefaultFullHttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString(), content);
         req.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-        req.headers().set(HttpHeaderNames.HOST, "localhost");
+        req.headers().set(HttpHeaderNames.HOST, "127.0.0.1");
         req.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
         req.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 

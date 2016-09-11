@@ -4,7 +4,10 @@ import com.zach.netty.media.Remote;
 import com.zach.netty.protobuf.EmailProBuf;
 import com.zach.netty.protobuf.ResponseMsgProtoBuf;
 import com.zach.netty.protobuf.UserProBuf;
+import com.zach.utils.JsonUtils;
 import org.springframework.stereotype.Controller;
+
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016-9-4.
@@ -27,9 +30,11 @@ public class UserController {
     }
 
     @Remote("httpGetEmailByUser")
-    public Object getEmailByUser(String email) {
+    public Object httpGetEmailByUser(Object email) {
 
-        email = email + "hhhh";
+        Map<String, Object> map = JsonUtils.jsonToBean(email.toString(), Map.class);
+
+        email = email.toString() + "hhhh";
 
         return email;
     }

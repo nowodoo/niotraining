@@ -58,9 +58,12 @@ public class Media {
                 ByteString requestParam = ((RequestMsgProtoBuf.RequestMsg)obj).getRequestParam();    //在这里我们看一下UserController的类型，是一个protobuffer对象。
                 Method parameterMethod = parameterType.getMethod("parseFrom", ByteString.class);   //在这里只是调用了parseFrom方法
                 parameterObj = parameterMethod.invoke(parameterObj, requestParam); //这个就是返回来的对象了
-            }else if (obj instanceof RequestParam) {  //表示http过来的
-                RequestParam requestParam = (RequestParam)obj;
-                parameterObj = JsonUtils.jsonToBean(requestParam.getParameter().toString(), method.getParameterTypes()[0]);  //这个超级给力，直接就是变为方法需要的类型
+            } else if (obj instanceof RequestParam) {  //表示http过来的
+                RequestParam requestParam = (RequestParam) obj;
+                String realParam = requestParam.getParameter().toString();
+                Class paramClass = method.getParameterTypes()[0];
+
+                parameterObj = JsonUtils.jsonToBean(realParam, paramClass);  //这个超级给力，直接就是变为方法需要的类型
             }
 
             response = method.invoke(bean, parameterObj); //这个才是最终的调用的业务逻辑方法

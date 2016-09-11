@@ -3,10 +3,14 @@ package com.zach.netty.http;
 import com.zach.netty.constants.CommonConstant;
 import com.zach.netty.protobuf.*;
 import com.zach.netty.protobuf.ResponseMsgProtoBuf;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.util.AttributeKey;
+
+import java.nio.charset.Charset;
 
 /**
  * Created by Administrator on 2016-8-30.
@@ -18,10 +22,13 @@ public class HttpClientHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        //接收到server过来的数据
-        FullHttpResponse response = (FullHttpResponse)msg;
+        if (msg instanceof HttpContent) {
+            System.out.println("yes");
+            HttpContent httpContent = (HttpContent)msg;
+            ByteBuf buf = httpContent.content();
+            ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(buf.toString(Charset.forName("UTF-8")));
+            ctx.channel().close();
+        }
 
-        ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(response);
-        ctx.channel().close();
     }
 }
