@@ -25,9 +25,9 @@ public class ChatRoomHandler extends SimpleChannelInboundHandler<TextWebSocketFr
         for (Channel channel : channels) {
             //表示其他的channel才会收到信息，本身的的话就直接关闭
             if (channel != incoming) {
-                channel.writeAndFlush(ctx.channel().remoteAddress()+":"+content);
+                channel.writeAndFlush(new TextWebSocketFrame(ctx.channel().remoteAddress()+":"+content));
             } else {
-                channel.writeAndFlush("服务器返回!");
+                channel.writeAndFlush(new TextWebSocketFrame("服务器返回!"));
             }
         }
     }
@@ -41,7 +41,7 @@ public class ChatRoomHandler extends SimpleChannelInboundHandler<TextWebSocketFr
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         //只要有一个channel进来，将会通知所有的channel
         for (Channel channel : channels) {
-            channel.writeAndFlush(ctx.channel().remoteAddress()+":已经进入聊天室!");
+            channel.writeAndFlush(new TextWebSocketFrame(ctx.channel().remoteAddress()+":已经进入聊天室!"));
         }
 
         //进入的新channel加入channel池
@@ -58,7 +58,7 @@ public class ChatRoomHandler extends SimpleChannelInboundHandler<TextWebSocketFr
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         //tell others that this channel leaved !
         for (Channel channel : channels) {
-            channel.writeAndFlush(ctx.channel().remoteAddress()+":已经进入聊天室!");
+            channel.writeAndFlush(new TextWebSocketFrame(ctx.channel().remoteAddress()+":已经离开聊天室!"));
         }
 
         channels.remove(ctx.channel());
