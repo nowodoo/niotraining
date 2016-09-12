@@ -1,6 +1,7 @@
 package com.zach.netty.thrift;
 
 
+import com.hzins.thrift.demo.ThriftRequest;
 import com.zach.netty.media.Media;
 import com.zach.utils.JsonUtils;
 import io.netty.buffer.ByteBuf;
@@ -8,7 +9,11 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TMemoryBuffer;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
@@ -22,18 +27,18 @@ public class ThriftServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        FullHttpRequest request = (FullHttpRequest) msg;
-        ByteBuf buf = request.content();
-        String req  = buf.toString(Charset.forName("UTF-8"));
-        RequestParam requestParam = JsonUtils.jsonToBean(req, RequestParam.class);
-        Object resp = Media.execute(requestParam);
-        String jsonp = JsonUtils.beanToJson(resp);
 
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(jsonp.getBytes("UTF-8")));
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE,"text/plain");
-        response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        response.headers().set(HttpHeaderNames.CONNECTION,HttpHeaderValues.KEEP_ALIVE);
-        ctx.writeAndFlush(response);
+        //byteBuffer 转换为 thriftRequest
+        ByteBuf buf = (ByteBuf)msg;
+
+        TMemoryBuffer buffer = new TMemoryBuffer(1024);
+        TProtocol prot = new TBinaryProtocol(buffer);
+
+        ThriftRequest req = new ThriftRequest();
+
+
+
+        Object resp = Media.execute(msg);
 
         ctx.channel().close();
     }

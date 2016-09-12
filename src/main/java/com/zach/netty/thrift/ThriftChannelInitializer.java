@@ -1,7 +1,10 @@
 package com.zach.netty.thrift;
 
+import com.zach.netty.thrift.codec.ThriftClientEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
@@ -14,9 +17,9 @@ public class ThriftChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast(new HttpRequestDecoder());
-        ch.pipeline().addLast(new HttpObjectAggregator(65536));
-        ch.pipeline().addLast(new HttpResponseEncoder());
+        ch.pipeline().addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()[0]));
+        //编码器和client一样
+        ch.pipeline().addLast(new ThriftClientEncoder());
         ch.pipeline().addLast(new ThriftServerHandler());
     }
 }

@@ -1,6 +1,7 @@
 package com.zach.netty.thrift;
 
 import com.zach.netty.constants.CommonConstant;
+import com.zach.netty.thrift.codec.ThriftClientEncoder;
 import com.zach.utils.JsonUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -13,6 +14,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.http.*;
 import io.netty.util.AttributeKey;
 
@@ -37,9 +40,8 @@ public class ThriftClient {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new HttpRequestEncoder());
-                    ch.pipeline().addLast(new HttpObjectAggregator(65536));
-                    ch.pipeline().addLast(new HttpResponseDecoder());
+                    ch.pipeline().addLast(new ThriftClientEncoder());
+                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Delimiters.lineDelimiter()[0]));
                     ch.pipeline().addLast(new ThriftClientHandler());
                 }
             });
