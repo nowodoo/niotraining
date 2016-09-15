@@ -34,22 +34,12 @@ public class ThriftTest {
 
 
         //真正调用客户端
-        ByteBuf obj = (ByteBuf)ThriftClient.startClient(request);
+        Content c = (Content)ThriftClient.startClient(request, Content.class);
 
-
-        //处理返回值
-        TMemoryBuffer respBuffer = new TMemoryBuffer(1024);  //这里就是借助于中间buffer来做事情，java就是这样，就只存在很多的中间变量去协助中间过程的进行，其实主要的就是一个方法。
-
-        //因为是内存来的，不能直接obj.array() 还需要处理一下
-        byte[] b = new byte[obj.readableBytes()];
-        obj.readBytes(b); //这里是直接读到b中去
-        respBuffer.write(b);
-
-//        respBuffer.write(obj.array());
-        TProtocol respProt = new TBinaryProtocol(respBuffer);
-        Content c = new Content();
-        c.read(respProt);
-
+        //将原先的处理逻辑放在client进行操作.
         System.out.println(c.getPhone());
+
+
+
     }
 }

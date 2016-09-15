@@ -18,7 +18,11 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.http.*;
 import io.netty.util.AttributeKey;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TMemoryBuffer;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.ByteBuffer;
 
@@ -54,12 +58,29 @@ public class ThriftClient {
         }
     }
 
-    public static Object startClient(Object requestParam) throws Exception {
+    public static Object startClient(Object requestParam, Class responseClass) throws Exception {
         ChannelFuture f = b.connect("localhost", 8999).sync();
 
         f.channel().writeAndFlush(requestParam);
         f.channel().closeFuture().sync();
-        return f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
+
+
+        //在client里面处理参数
+        ByteBuf obj = (ByteBuf)f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
+        TMemoryBuffer respBuffer = new TMemoryBuffer(1024);
+        byte[] b = new byte[obj.readableBytes()];
+        obj.readBytes(b);
+        respBuffer.write(b);
+
+        TProtocol respProt = new TBinaryProtocol(respBuffer);
+        //在这里调用content类的read方法
+        Method m = responseClass.getMethod("read", TProtocol.class);
+        //这里的response其实就是content
+        Object response = responseClass.newInstance();
+
+        m.invoke(response, respProt);
+
+        return response;
     }
 
     public static void main(String[] args) {
