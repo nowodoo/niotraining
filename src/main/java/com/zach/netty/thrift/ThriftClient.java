@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.util.AttributeKey;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 
 /**
  * Created by Administrator on 2016-8-30.
@@ -53,7 +54,7 @@ public class ThriftClient {
         }
     }
 
-    public static Object startClient(RequestParam requestParam) throws Exception {
+    public static Object startClient(byte[] requestParam) throws Exception {
         ChannelFuture f = b.connect("localhost", 8999).sync();
         URI uri = new URI("http://127.0.0.1:8999");
         ByteBuf content = Unpooled.wrappedBuffer(JsonUtils.beanToJson(requestParam).getBytes("UTF-8"));
