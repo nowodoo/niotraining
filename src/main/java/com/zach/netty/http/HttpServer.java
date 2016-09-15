@@ -11,7 +11,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class HttpServer implements ApplicationListener<ContextRefreshedEvent>,Ordered {
 
     private int port;

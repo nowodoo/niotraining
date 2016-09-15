@@ -54,17 +54,10 @@ public class ThriftClient {
         }
     }
 
-    public static Object startClient(byte[] requestParam) throws Exception {
+    public static Object startClient(Object requestParam) throws Exception {
         ChannelFuture f = b.connect("localhost", 8999).sync();
-        URI uri = new URI("http://127.0.0.1:8999");
-        ByteBuf content = Unpooled.wrappedBuffer(JsonUtils.beanToJson(requestParam).getBytes("UTF-8"));
-        DefaultFullHttpRequest req = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString(), content);
-        req.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-        req.headers().set(HttpHeaderNames.HOST, "127.0.0.1");
-        req.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
-        req.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 
-        f.channel().writeAndFlush(req);
+        f.channel().writeAndFlush(requestParam);
         f.channel().closeFuture().sync();
         return f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
     }

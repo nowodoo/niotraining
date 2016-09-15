@@ -82,7 +82,7 @@ public class Media {
                 buffer.write(requestParam);
                 TProtocol prot = new TBinaryProtocol(buffer);
                 //触发这个方法
-                parameterMethod.invoke(bean, parameterObj);
+                parameterMethod.invoke(parameterObj, prot);
             }
 
             response = method.invoke(bean, parameterObj); //这个才是最终的调用的业务逻辑方法

@@ -4,13 +4,10 @@ import com.hzins.thrift.demo.Content;
 import com.hzins.thrift.demo.ThriftRequest;
 import com.zach.netty.thrift.ThriftClient;
 import io.netty.buffer.ByteBuf;
-import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TMemoryBuffer;
 import org.junit.Test;
-
-import java.nio.ByteBuffer;
 
 /**
  * Created by Administrator on 2016-9-15.
@@ -35,13 +32,9 @@ public class ThriftTest {
         request.setRequestParam(buffer.getArray());
         buffer.close();
 
-        TMemoryBuffer reqBuffer = new TMemoryBuffer(1024);
-        TProtocol reqProt = new TBinaryProtocol(reqBuffer);
-        request.write(reqProt);
 
         //真正调用客户端
-        ByteBuf obj = (ByteBuf)ThriftClient.startClient(reqBuffer.getArray());
-        reqBuffer.close();
+        ByteBuf obj = (ByteBuf)ThriftClient.startClient(request);
 
 
         //处理返回值
