@@ -38,8 +38,5 @@ public class ThriftTest {
 
         //将原先的处理逻辑放在client进行操作.
         System.out.println(c.getPhone());
-
-
-
     }
 }

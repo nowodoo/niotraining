@@ -65,12 +65,12 @@ public class ThriftClient {
         f.channel().closeFuture().sync();
 
 
-        //在client里面处理参数
+        //在client里面处理参数，这里处理的是来自server端的信息。
         ByteBuf obj = (ByteBuf)f.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).get();
         TMemoryBuffer respBuffer = new TMemoryBuffer(1024);
         byte[] b = new byte[obj.readableBytes()];
-        obj.readBytes(b);
-        respBuffer.write(b);
+        obj.readBytes(b);  //把obj写到b里面
+        respBuffer.write(b);  //将b写到respBuffer里面
 
         TProtocol respProt = new TBinaryProtocol(respBuffer);
         //在这里调用content类的read方法
