@@ -17,5 +17,7 @@ public class ThriftClientHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //这里msg是bytebuf
         ctx.channel().attr(AttributeKey.valueOf(CommonConstant.ATTRIBUTE_KEY)).set(msg);
+        //解决卡死
+        ctx.close();
     }
 }
