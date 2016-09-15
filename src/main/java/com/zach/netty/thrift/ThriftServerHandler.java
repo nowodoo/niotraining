@@ -31,15 +31,28 @@ public class ThriftServerHandler extends ChannelHandlerAdapter {
         //byteBuffer 转换为 thriftRequest
         ByteBuf buf = (ByteBuf)msg;
 
+        //表示直接去内存中去读
         TMemoryBuffer buffer = new TMemoryBuffer(1024);
+
+        //数据是二进制的
+        if (buf.hasArray()) {
+            buffer.write(buf.array());
+        } else {
+            byte[] dst = new byte[buf.readableBytes()];  //根据实际实际拥有的创建大小
+            //这个地方也是一个关键，就只如何将一个bytebu写到平常的byte里面去
+            buf.readBytes(dst);  //将buf的数据写到dst里面去。
+            buffer.write(dst);
+        }
+
+
+        //这里就是整个架构的关键
         TProtocol prot = new TBinaryProtocol(buffer);
-
         ThriftRequest req = new ThriftRequest();
+        req.read(prot);
+        Object resp = Media.execute(req);
 
 
-
-        Object resp = Media.execute(msg);
-
-        ctx.channel().close();
+        //最后将结果返回
+        ctx.writeAndFlush(resp);
     }
 }

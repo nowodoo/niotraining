@@ -1,9 +1,13 @@
 package com.zach.netty.media;
 
 import com.google.protobuf.ByteString;
+import com.hzins.thrift.demo.ThriftRequest;
 import com.zach.netty.http.RequestParam;
 import com.zach.netty.protobuf.RequestMsgProtoBuf;
 import com.zach.utils.JsonUtils;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TMemoryBuffer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -28,18 +32,20 @@ public class Media {
                 cmd = ((RequestMsgProtoBuf.RequestMsg)obj).getCmd();
             }else if (obj instanceof RequestParam) {
                 cmd = ((RequestParam) obj).getCommand();
+            }else if (obj instanceof ThriftRequest) {
+                cmd = ((ThriftRequest) obj).getCommand();
             }
 
             //首先初始化上面的map，then the code blow will work.
             MethodBean methodBean = methodBeans.get(cmd);
             Method method = methodBean.getMethod();
             Object bean = methodBean.getBean();
+            //获取目标方法的参数类型
+            Class parameterType = method.getParameterTypes()[0];
 
 
             //这个表示是protobuf过来的
             if (obj instanceof RequestMsgProtoBuf.RequestMsg) {
-                //获取目标方法的参数类型
-                Class parameterType = method.getParameterTypes()[0];
                 //找到目标方法的所有的构造方法
                 Constructor[] constructors = parameterType.getConstructors();
                 Constructor c = null;  //获取这个类的构造方法，然后刁颖newInstance方法就可以构造这个类
@@ -64,6 +70,19 @@ public class Media {
                 Class paramClass = method.getParameterTypes()[0];
 
                 parameterObj = JsonUtils.jsonToBean(realParam, paramClass);  //这个超级给力，直接就是变为方法需要的类型
+            }else if (obj instanceof ThriftRequest) {
+                //首选拿出参数
+                byte[] requestParam = ((ThriftRequest) obj).getRequestParam();
+                //就是前面在serverHandler里面调用read方法，现在使用反射进行调用
+                Method parameterMethod = parameterType.getMethod("read", TProtocol.class);
+                parameterObj = parameterType.newInstance();
+
+                //获取真正的参数
+                TMemoryBuffer buffer = new TMemoryBuffer(requestParam.length);
+                buffer.write(requestParam);
+                TProtocol prot = new TBinaryProtocol(buffer);
+                //触发这个方法
+                parameterMethod.invoke(bean, parameterObj);
             }
 
             response = method.invoke(bean, parameterObj); //这个才是最终的调用的业务逻辑方法
