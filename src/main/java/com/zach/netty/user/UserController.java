@@ -1,5 +1,6 @@
 package com.zach.netty.user;
 
+import com.hzins.thrift.demo.Content;
 import com.zach.netty.media.Remote;
 import com.zach.netty.protobuf.EmailProBuf;
 import com.zach.netty.protobuf.ResponseMsgProtoBuf;
@@ -37,5 +38,14 @@ public class UserController {
         email = email.toString() + "hhhh";
 
         return email;
+    }
+
+    @Remote("ThriftGetEmailByContent")
+    public Object getEmail(Content content){
+        System.out.println(content.getPhone());
+        content.setId(1);
+        content.setPhone("15626519062");
+        content.setIdIsSet(true);
+        return content;
     }
 }
